@@ -4,9 +4,47 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ast"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="600" Width="960" d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}">
+    <xctk:BusyIndicator IsBusy="{Binding IsBusy}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid Row="0">
+                <GroupBox Header="ASTERISK">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Text="{Binding Sever}"/>
+                        <TextBox Text="{Binding Port}"/>
+                        <TextBox Text="{Binding User}"/>
+                        <TextBox Text="{Binding Password}"/>
+                        <Button Command="{Binding ConnectCmd}">Connect</Button>
+                        <TextBox IsReadOnly="True" IsReadOnlyCaretVisible="False" Text="{Binding AstStatus}"/>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+            <Grid Row="1">
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Header="PRI 1">
+                        <local:PriTest DataContext="{Binding Pri1}" />
+                    </GroupBox>
+                    <GroupBox Header="PRI 2">
+                        <local:PriTest DataContext="{Binding Pri2}" />
+                    </GroupBox>
+                    <GroupBox Header="PRI 3">
+                        <local:PriTest DataContext="{Binding Pri3}" />
+                    </GroupBox>
+                    <GroupBox Header="PRI 4">
+                        <local:PriTest DataContext="{Binding Pri4}" />
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+            <Grid Row="2">
+
+            </Grid>
+        </Grid>
+    </xctk:BusyIndicator>
 </Window>

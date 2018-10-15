@@ -20,5 +20,9 @@
         {
             return $"{nameof(SpanId)}: {SpanId}, {nameof(ChanId)}: {ChanId}, {nameof(Idle)}: {Idle}, {nameof(CallLevel)}: {CallLevel}, {nameof(PriCall)}: {PriCall}, {nameof(Channel)}: {Channel}";
         }
+
+
+        public bool IsIdle => Idle == "Yes";
+        public bool IsPriCall => PriCall == "Yes";
     }
 }

@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Ast.PriTest"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Ast"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=local:PriTestViewModel}" d:DesignWidth="400">
+    <UserControl.Resources>
+        <xctk:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </UserControl.Resources>
+    <Grid HorizontalAlignment="Stretch">
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+            <Label>Channels:</Label>
+            <TextBox Text="{Binding ChannelsCnt}" IsReadOnly="{Binding IsTestStarted}"/>
+            <Label>Number to call:</Label>
+            <TextBox Text="{Binding NumberToCall}" IsReadOnly="{Binding IsTestStarted}"/>
+            <Label>Extension:</Label>
+            <TextBox Text="{Binding Extension}" IsReadOnly="{Binding IsTestStarted}"/>
+            <Button Command="{Binding StartCmd}" IsEnabled="{Binding IsTestStarted, Converter={StaticResource InverseBoolConverter}}">Start</Button>
+            <Button Command="{Binding StopCmd}" IsEnabled="{Binding IsTestStarted}">Stop</Button>
+            <Label>Calls:</Label>
+            <TextBox IsReadOnly="True" IsReadOnlyCaretVisible="False" Text="{Binding ChannelsUsedCnt}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
