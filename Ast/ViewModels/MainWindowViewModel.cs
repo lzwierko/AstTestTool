@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -16,6 +17,7 @@ namespace Ast
         private PriTestViewModel _pri3;
         private PriTestViewModel _pri4;
         private bool _isBusy;
+        private string _astStatus;
 
         #region view - server
 
@@ -43,9 +45,16 @@ namespace Ast
             set { _password = value; RaisePropertyChanged(); }
         }
 
-        public string AstStatus { get; set; }
+        public string AstStatus
+        {
+            get => _astStatus;
+            set { _astStatus = value; RaisePropertyChanged(); }
+        }
 
-        public ICommand ConnectCmd => new RelayCommand(() => Connect(this));
+        public ICommand ConnectCmd => new RelayCommand(() =>
+        {
+            Connect(this);
+        });
 
         public bool IsBusy
         {
@@ -81,7 +90,12 @@ namespace Ast
         {
             get => _pri4;
             set { _pri4 = value; RaisePropertyChanged(); }
-        }       
+        }
+
+        public IEnumerable<PriTestViewModel> GetPris()
+        {
+            return new[] { Pri1, Pri2, Pri3, Pri4 };
+        }
 
         #endregion
     }

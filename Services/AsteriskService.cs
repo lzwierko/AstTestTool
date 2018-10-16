@@ -64,9 +64,8 @@ namespace Services
                 .Split('\n')
                 .Skip(2)
                 .Select(s => s.Trim())
-                .Where(s => s.StartsWith(Dahdi))
                 .Select(s => s.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
-                .Select(s => new PriChannelStatus()
+                .Select(s => new PriChannelStatus
                 {
                     SpanId = TryGet(s, 0),
                     ChanId = TryGet(s, 1),

@@ -7,11 +7,13 @@ namespace Ast
 {
     public class PriTestViewModel : ViewModelBase
     {
-        private int _channelsCnt;
+        private int _channelsCnt = 1;
         private bool _isTestStarted;
         private int _channelsUsedCnt;
 
         public string Id { get; set; }
+
+        public string SpanId { get; set; }
 
         public int ChannelsCnt
         {
@@ -25,9 +27,9 @@ namespace Ast
             }
         }
 
-        public string NumberToCall { get; set; }
+        public string NumberToCall { get; set; } = "966";
 
-        public string Extension{ get; set; }
+        public string Extension { get; set; } = "966@local";
 
         public ICommand StartCmd => new RelayCommand(() => Start(this));
 
@@ -48,7 +50,7 @@ namespace Ast
         {
             get => _channelsUsedCnt;
             set { _channelsUsedCnt = value; RaisePropertyChanged(); }
-        }        
+        }
 
         #endregion
     }

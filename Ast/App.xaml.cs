@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,24 +13,28 @@ namespace Ast
     public partial class App
     {
         private MainWindowViewModel _vm;
-        private SynchronizationContext _context;
-        private Logger _logger = LogManager.GetLogger("App");
-
+        private SynchronizationContext _sc;
+        private readonly Logger _logger = LogManager.GetLogger("App");
+        private readonly Dictionary<string, TestRunner> _tests = new Dictionary<string, TestRunner>();
+        private readonly Dictionary<string, PriMonitor> _pris = new Dictionary<string, PriMonitor>();
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             _vm = new MainWindowViewModel
             {
-                Pri1 = CreatePriTestViewModel("i1"),
-                Pri2 = CreatePriTestViewModel("i2"),
-                Pri3 = CreatePriTestViewModel("i3"),
-                Pri4 = CreatePriTestViewModel("i4"),
+                Pri1 = CreatePriTestViewModel("i1", "1"),
+                Pri2 = CreatePriTestViewModel("i2", "2"),
+                Pri3 = CreatePriTestViewModel("i3", "3"),
+                Pri4 = CreatePriTestViewModel("i4", "4"),
                 Connect = ConnectAsterisk
             };
             LoadAsteriskData();
 
-            _context = SynchronizationContext.Current;
+            _sc = SynchronizationContext.Current;
 
-            MainWindow = new MainWindow();
+            MainWindow = new MainWindow
+            {
+                DataContext = _vm
+            };
             MainWindow.Show();
         }
 
@@ -54,6 +60,13 @@ namespace Ast
                     _logger.Info("ConnectAsterisk");
                     await GetAst().PriGetChannels();
                     _vm.AstStatus = "OK";
+                    Settings.Default.Server = _vm.Sever;
+                    Settings.Default.User = _vm.User;
+                    Settings.Default.Password = _vm.Password;
+                    Settings.Default.Port = _vm.Port;
+                    Settings.Default.Save();
+
+                    _vm.GetPris().ToList().ForEach(StartMonitor);
                 }
                 catch (Exception ex)
                 {
@@ -71,22 +84,50 @@ namespace Ast
             _vm.Password = Settings.Default.Password;
         }
 
-        private PriTestViewModel CreatePriTestViewModel(string id)
+        private PriTestViewModel CreatePriTestViewModel(string id, string spanId)
         {
             return new PriTestViewModel
             {
                 Id = id,
+                SpanId = spanId,
                 Start = StartTest,
                 Stop = StopTest
             };
         }
 
-        private void StopTest(PriTestViewModel obj)
-        {
-        }
-
         private void StartTest(PriTestViewModel obj)
         {
+            if (_tests.TryGetValue(obj.Id, out _))
+            {
+                return;
+            }
+            var runner = new TestRunner(_sc, obj, GetAst());
+            runner.Start();
+            _tests[obj.Id] = runner;
+            obj.IsTestStarted = true;
+        }
+
+        private void StopTest(PriTestViewModel obj)
+        {
+            if (!_tests.TryGetValue(obj.Id, out var runner))
+            {
+                return;
+            }
+            runner.Stop();
+            _tests.Remove(obj.Id);
+            obj.IsTestStarted = false;
+        }
+
+        private void StartMonitor(PriTestViewModel obj)
+        {
+            if (_pris.TryGetValue(obj.Id, out var pri))
+            {
+                pri.Stop();
+                _pris.Remove(obj.Id);
+            }
+            pri = new PriMonitor(_sc, obj, GetAst());
+            pri.Start();
+            _pris[obj.Id] = pri;
         }
     }
 }

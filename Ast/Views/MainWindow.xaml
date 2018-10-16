@@ -6,7 +6,15 @@
         xmlns:local="clr-namespace:Ast"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
+        WindowStyle="ThreeDBorderWindow"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
         Title="MainWindow" Height="600" Width="960" d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}">
+    <Window.Resources>
+        <Style x:Key="ChannelsTxtBox" TargetType="TextBox">
+            <Setter Property="Width" Value="50"/>
+        </Style>
+    </Window.Resources>
     <xctk:BusyIndicator IsBusy="{Binding IsBusy}">
         <Grid>
             <Grid.RowDefinitions>
