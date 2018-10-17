@@ -10,6 +10,9 @@ namespace Ast
         private int _channelsCnt = 1;
         private bool _isTestStarted;
         private int _channelsUsedCnt;
+        private int _totalCalls;
+
+        #region view
 
         public string Id { get; set; }
 
@@ -27,9 +30,9 @@ namespace Ast
             }
         }
 
-        public string NumberToCall { get; set; } = "966";
+        public string NumberToCall { get; set; } = "912";
 
-        public string Extension { get; set; } = "966@local";
+        public string Extension { get; set; } = "912@local";
 
         public ICommand StartCmd => new RelayCommand(() => Start(this));
 
@@ -41,16 +44,24 @@ namespace Ast
             set { _isTestStarted = value; RaisePropertyChanged(); }
         }
 
-        #region model
-
-        public Action<PriTestViewModel> Start { get; set; }
-        public Action<PriTestViewModel> Stop { get; set; }
-
         public int ChannelsUsedCnt
         {
             get => _channelsUsedCnt;
             set { _channelsUsedCnt = value; RaisePropertyChanged(); }
         }
+
+        #endregion
+
+        public int TotalCalls
+        {
+            get => _totalCalls;
+            set { _totalCalls = value; RaisePropertyChanged(); }
+        }
+
+        #region model
+
+        public Action<PriTestViewModel> Start { get; set; }
+        public Action<PriTestViewModel> Stop { get; set; }
 
         #endregion
     }

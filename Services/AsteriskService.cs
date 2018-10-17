@@ -16,7 +16,7 @@ namespace Services
         private readonly string _pass;
         private readonly int _port;
 
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetLogger(nameof(AsteriskService));
 
         public AsteriskService(string server, int port, string user, string pass)
         {
@@ -26,15 +26,26 @@ namespace Services
             _pass = pass;
         }
 
-        public async Task OriginateExt(string ifcId, string dnis, string extension)
+        public async Task OriginateExt(string ifcId, string dnis, string extension, int count = 1)
         {
-            //originate DAHDI/i2/966 extension 966@local
-            await ExecuteSsh($"originate DAHDI/{ifcId}/{dnis} extension {extension}");
+            using (var client = new SshClient(_server, _port, _user, _pass))
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    await ExecuteSshWithClient($"originate DAHDI/{ifcId}/{dnis} extension {extension}", client);
+                }
+            }
         }
 
-        public async Task OriginateApp(string ifcId, string dnis, string appName)
+        public async Task OriginateApp(string ifcId, string dnis, string appName, int count = 1)
         {
-            await ExecuteSsh($"originate DAHDI/{ifcId}/{dnis} extension {appName}");
+            using (var client = new SshClient(_server, _port, _user, _pass))
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    await ExecuteSshWithClient($"originate DAHDI/{ifcId}/{dnis} application {appName}", client);
+                }
+            }
         }
 
         public async Task<List<CoreChannelStatus>> CoreGetChannels()
@@ -82,14 +93,31 @@ namespace Services
         {
             using (var client = new SshClient(_server, _port, _user, _pass))
             {
-                _logger.Info($"ExecuteSsh: {cmd}");
-                client.Connect();
-                var cmdTxt = $"asterisk -rx \"{cmd}\"";
-                var command = client.CreateCommand(cmdTxt);
-                var result = await Task.Factory.FromAsync(command.BeginExecute(), command.EndExecute);
-                _logger.Info($"ExecuteSsh: {result}");
-                return result;
+                return await ExecuteSshWithClient(cmd, client);
             }
+        }
+
+        private async Task<string> ExecuteSshWithClient(string cmd, SshClient client)
+        {
+            _logger.Debug($"ExecuteSsh: {cmd}");
+            if (!client.IsConnected)
+            {
+                _logger.Debug("ssh connect client");
+                client.Connect();
+            }
+            var cmdTxt = $"asterisk -rx \"{cmd}\"";
+            var command = client.CreateCommand(cmdTxt);
+            var result = await Task.Factory.FromAsync(command.BeginExecute(), command.EndExecute);
+            if (_logger.IsTraceEnabled)
+            {
+                _logger.Trace($"ExecuteSsh: {result}");
+            }
+            else
+            {
+                _logger.Debug($"ExecuteSsh: {cmd} complete");
+            }
+
+            return result;
         }
     }
 }

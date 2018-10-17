@@ -19,13 +19,16 @@ namespace Ast
         private readonly Dictionary<string, PriMonitor> _pris = new Dictionary<string, PriMonitor>();
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
+            _logger.Info("App_OnStartup");
+
             _vm = new MainWindowViewModel
             {
                 Pri1 = CreatePriTestViewModel("i1", "1"),
                 Pri2 = CreatePriTestViewModel("i2", "2"),
                 Pri3 = CreatePriTestViewModel("i3", "3"),
                 Pri4 = CreatePriTestViewModel("i4", "4"),
-                Connect = ConnectAsterisk
+                Connect = ConnectAsterisk,
+                AstStatus = "UNKNOWN"
             };
             LoadAsteriskData();
 
@@ -104,6 +107,7 @@ namespace Ast
             var runner = new TestRunner(_sc, obj, GetAst());
             runner.Start();
             _tests[obj.Id] = runner;
+            obj.TotalCalls = 0;
             obj.IsTestStarted = true;
         }
 

@@ -25,10 +25,10 @@
             <Grid Row="0">
                 <GroupBox Header="ASTERISK">
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Text="{Binding Sever}"/>
-                        <TextBox Text="{Binding Port}"/>
-                        <TextBox Text="{Binding User}"/>
-                        <TextBox Text="{Binding Password}"/>
+                        <xctk:WatermarkTextBox Watermark="Server" Text="{Binding Sever}"/>
+                        <xctk:WatermarkTextBox Watermark="Port" Text="{Binding Port}"/>
+                        <xctk:WatermarkTextBox Watermark="User" Text="{Binding User}"/>
+                        <xctk:WatermarkTextBox Watermark="Password" Text="{Binding Password}"/>
                         <Button Command="{Binding ConnectCmd}">Connect</Button>
                         <TextBox IsReadOnly="True" IsReadOnlyCaretVisible="False" Text="{Binding AstStatus}"/>
                     </StackPanel>

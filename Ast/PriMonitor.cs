@@ -41,10 +41,10 @@ namespace Ast
                 try
                 {
                     _logger.Trace("callback");
-                    var channels = (await _ast.PriGetChannels());
-                    channels = (await _ast.PriGetChannels()).Where(a => a.SpanId == _vm.SpanId).ToList();
-                    _logger.Trace($"in call after: {channels.Count(c => c.IsIdle)}");
-                    var inPriCallCnt = channels.Count(c => c.IsPriCall);
+                    var channels = (await _ast.PriGetChannels()).Where(a => a.SpanId == _vm.SpanId).ToList();
+                    var priCallCnt = channels.Count(c => c.IsPriCall);
+                    _logger.Trace($"in call: {priCallCnt}");
+                    var inPriCallCnt = priCallCnt;
                     _sc.Post(o => { _vm.ChannelsUsedCnt = inPriCallCnt; }, null);
                 }
                 catch (Exception ex)

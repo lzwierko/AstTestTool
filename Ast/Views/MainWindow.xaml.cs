@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace Ast
+﻿namespace Ast
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

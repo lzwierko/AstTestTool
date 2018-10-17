@@ -14,6 +14,7 @@ namespace Ast
         private readonly AsteriskService _ast;
         private Timer _timer;
         private readonly Logger _logger;
+        private bool _isRunning;
 
         public TestRunner(SynchronizationContext sc, PriTestViewModel vm, AsteriskService ast)
         {
@@ -25,7 +26,7 @@ namespace Ast
 
         public void Start()
         {
-            _timer = new Timer(Callback, null, 5000, 5000);
+            _timer = new Timer(Callback, null, 100, 2000);
         }
 
         public void Stop()
@@ -36,16 +37,20 @@ namespace Ast
 
         private void Callback(object state)
         {
+            if (_isRunning) return;
             Task.Run(async () =>
             {
                 try
                 {
-                    _logger.Trace("callback");
+                    if (_isRunning) return;
+                    _isRunning = true;
+
+                    _logger.Trace("callback run");
                     var channels = (await _ast.PriGetChannels());
                     channels = channels.Where(a => a.SpanId == _vm.SpanId).ToList();
-                    _logger.Trace($"in call before: {channels.Count(c => c.IsIdle)}");
-
                     var inPriCallCnt = channels.Count(c => c.IsPriCall);
+                    _logger.Trace($"in call before: {inPriCallCnt}");
+                    var newCalls = 0;
                     if (inPriCallCnt < _vm.ChannelsCnt)
                     {
                         var diff = (_vm.ChannelsCnt - inPriCallCnt) / 2;
@@ -53,19 +58,34 @@ namespace Ast
                             diff = 1;
                         for (var i = 0; i < diff; i++)
                         {
-                            _logger.Info("make next call");
-                            await _ast.OriginateExt(_vm.Id, _vm.NumberToCall, _vm.Extension);
+                            _logger.Info($"make next call: {i}");
+                            _ast.OriginateExt(_vm.Id, _vm.NumberToCall, _vm.Extension);
+                            _logger.Info($"make next call: {i} completed");
+                            newCalls++;
                         }
                     }
 
                     channels = (await _ast.PriGetChannels()).Where(a => a.SpanId == _vm.SpanId).ToList();
-                    _logger.Trace($"in call after: {channels.Count(c => c.IsIdle)}");
+                    _logger.Trace($"in call after: {channels.Count(c => c.IsPriCall)}");
                     inPriCallCnt = channels.Count(c => c.IsPriCall);
-                    _sc.Post(o => { _vm.ChannelsUsedCnt = inPriCallCnt; }, null);
+                    _sc.Post(o =>
+                    {
+                        if (newCalls != 0)
+                        {
+                            _vm.TotalCalls += newCalls;
+                        }
+
+                        _vm.ChannelsUsedCnt = inPriCallCnt;
+                    }, null);
                 }
                 catch (Exception ex)
                 {
                     _logger.Error(ex);
+                }
+                finally
+                {
+                    _logger.Trace("callback end");
+                    _isRunning = false;
                 }
             });
         }

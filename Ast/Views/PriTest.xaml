@@ -12,19 +12,24 @@
         <Style x:Key="ChannelsTxtBox" TargetType="TextBox" BasedOn="{StaticResource DefaultTextBox}">
             <Setter Property="Width" Value="25"/>
         </Style>
+        <Style x:Key="TotalCallsTxtBox" TargetType="TextBox" BasedOn="{StaticResource DefaultTextBox}">
+            <Setter Property="Width" Value="100"/>
+        </Style>
     </UserControl.Resources>
     <Grid HorizontalAlignment="Stretch">
         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
             <Label>Channels:</Label>
             <TextBox Text="{Binding ChannelsCnt}" IsReadOnly="{Binding IsTestStarted}" Style="{StaticResource ChannelsTxtBox}"/>
             <Label>Number to call:</Label>
-            <TextBox Text="{Binding NumberToCall}" IsReadOnly="{Binding IsTestStarted}"/>
+            <xctk:WatermarkTextBox Watermark="Number to call"  Text="{Binding NumberToCall}" IsReadOnly="{Binding IsTestStarted}"/>
             <Label>Extension:</Label>
-            <TextBox Text="{Binding Extension}" IsReadOnly="{Binding IsTestStarted}"/>
+            <xctk:WatermarkTextBox Watermark="number@extension" Text="{Binding Extension}" IsReadOnly="{Binding IsTestStarted}"/>
             <Button Command="{Binding StartCmd}" IsEnabled="{Binding IsTestStarted, Converter={StaticResource InverseBoolConverter}}">Start</Button>
             <Button Command="{Binding StopCmd}" IsEnabled="{Binding IsTestStarted}">Stop</Button>
             <Label>Calls:</Label>
-            <TextBox IsReadOnly="True" IsReadOnlyCaretVisible="False" Text="{Binding ChannelsUsedCnt}" Style="{StaticResource ChannelsTxtBox}"/>
+            <TextBox IsReadOnly="True" IsReadOnlyCaretVisible="False" Text="{Binding ChannelsUsedCnt, Mode=TwoWay}" Style="{StaticResource ChannelsTxtBox}"/>
+            <Label>Total:</Label>
+            <TextBox IsReadOnly="True" IsReadOnlyCaretVisible="False" Text="{Binding TotalCalls, Mode=TwoWay}" Style="{StaticResource TotalCallsTxtBox}"/>
         </StackPanel>
     </Grid>
 </UserControl>
